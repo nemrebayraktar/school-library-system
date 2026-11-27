@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+{% block title %}Borrow Tracking - Admin{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">Borrow Tracking</h2>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+        <select onchange="window.location.href='{{ url_for('admin_borrows') }}?status='+this.value" class="form-control" style="width: auto;">
+            <option value="">All Status</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Overdue</option>
+            <option value="returned" {% if status_filter == 'returned' %}selected{% endif %}>Returned</option>
+        </select>
+        <a href="{{ url_for('admin_borrow_add') }}" class="btn btn-primary">+ Lend Book</a>
+    </div>
+</header>
+
+<div class="page-content">
+    <div class="card">
+        <table class="table">
+            <thead><tr><th>Book</th><th>Student</th><th>Borrow Date</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for borrow in borrows.items %}
+                <tr>
+                    <td><strong>{{ borrow.book.title }}</strong></td>
+                    <td>{{ borrow.student.name }}</td>
+                    <td>{{ borrow.borrow_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ borrow.due_date.strftime('%Y-%m-%d') }}</td>
+                    <td><span class="badge badge-{% if borrow.status == 'returned' %}success{% elif borrow.status == 'overdue' %}danger{% else %}warning{% endif %}">{{ borrow.status|title }}</span></td>
+                    <td>
+                        {% if borrow.status in ['active', 'overdue'] %}
+                        <div style="display: flex; gap: 0.5rem;">
+                            <form action="{{ url_for('admin_borrow_return', id=borrow.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-success">Return</button>
+                            </form>
+                            <form action="{{ url_for('admin_borrow_extend', id=borrow.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-outline">+7 Days</button>
+                            </form>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No borrows found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if borrows.pages > 1 %}
+    <div class="pagination">
+        {% if borrows.has_prev %}<a href="{{ url_for('admin_borrows', page=borrows.prev_num, status=status_filter) }}" class="page-link">&laquo;</a>{% endif %}
+        {% for page_num in borrows.iter_pages() %}{% if page_num %}<a href="{{ url_for('admin_borrows', page=page_num, status=status_filter) }}" class="page-link {% if page_num == borrows.page %}active{% endif %}">{{ page_num }}</a>{% endif %}{% endfor %}
+        {% if borrows.has_next %}<a href="{{ url_for('admin_borrows', page=borrows.next_num, status=status_filter) }}" class="page-link">&raquo;</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

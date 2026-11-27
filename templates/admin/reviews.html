@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}Reviews - Admin{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">All Reviews</h2>
+</header>
+
+<div class="page-content">
+    <div class="card">
+        <table class="table">
+            <thead><tr><th>Book</th><th>Student</th><th>Rating</th><th>Comment</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for review in reviews.items %}
+                <tr>
+                    <td><strong>{{ review.book.title }}</strong></td>
+                    <td>{{ review.student.name }}</td>
+                    <td>
+                        {% for i in range(1, 6) %}
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="{% if i <= review.rating %}#f59e0b{% else %}#ddd{% endif %}"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        {% endfor %}
+                    </td>
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">{{ review.comment or '-' }}</td>
+                    <td>{{ review.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <form action="{{ url_for('admin_review_delete', id=review.id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No reviews yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if reviews.pages > 1 %}
+    <div class="pagination">
+        {% if reviews.has_prev %}<a href="{{ url_for('admin_reviews', page=reviews.prev_num) }}" class="page-link">&laquo;</a>{% endif %}
+        {% for page_num in reviews.iter_pages() %}{% if page_num %}<a href="{{ url_for('admin_reviews', page=page_num) }}" class="page-link {% if page_num == reviews.page %}active{% endif %}">{{ page_num }}</a>{% endif %}{% endfor %}
+        {% if reviews.has_next %}<a href="{{ url_for('admin_reviews', page=reviews.next_num) }}" class="page-link">&raquo;</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

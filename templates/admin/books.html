@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+{% block title %}Books - Admin{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">Books</h2>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+        <form action="{{ url_for('admin_books') }}" method="get" class="search-box">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search books...">
+            <button type="submit"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+        </form>
+        <a href="{{ url_for('admin_book_add') }}" class="btn btn-primary">+ Add Book</a>
+    </div>
+</header>
+
+<div class="page-content">
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cover</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books.items %}
+                <tr>
+                    <td>
+                        {% if book.image_path %}
+                        <img src="{{ url_for('static', filename='uploads/' + book.image_path) }}" alt="{{ book.title }}" style="width: 40px; height: 55px; object-fit: cover; border-radius: 4px;">
+                        {% else %}
+                        <div style="width: 40px; height: 55px; background: var(--bg-main); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-muted)"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ book.title }}</strong></td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.category.name if book.category else '-' }}</td>
+                    <td>Floor {{ book.floor }}, Shelf {{ book.shelf }}</td>
+                    <td><span class="badge {% if book.available > 0 %}badge-success{% else %}badge-danger{% endif %}">{{ book.available }}/{{ book.quantity }}</span></td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{{ url_for('admin_book_edit', id=book.id) }}" class="btn btn-sm btn-outline">Edit</a>
+                            <form action="{{ url_for('admin_book_delete', id=book.id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No books found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if books.pages > 1 %}
+    <div class="pagination">
+        {% if books.has_prev %}<a href="{{ url_for('admin_books', page=books.prev_num, search=search) }}" class="page-link">&laquo;</a>{% endif %}
+        {% for page_num in books.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}<a href="{{ url_for('admin_books', page=page_num, search=search) }}" class="page-link {% if page_num == books.page %}active{% endif %}">{{ page_num }}</a>{% else %}<span class="page-link disabled">...</span>{% endif %}
+        {% endfor %}
+        {% if books.has_next %}<a href="{{ url_for('admin_books', page=books.next_num, search=search) }}" class="page-link">&raquo;</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

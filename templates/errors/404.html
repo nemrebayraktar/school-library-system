@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found - Library{% endblock %}
+
+{% block content %}
+<div class="page-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
+    <svg viewBox="0 0 24 24" width="80" height="80" fill="var(--text-muted)" style="margin-bottom: 1rem;">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+    </svg>
+    <h1 style="font-size: 3rem; margin-bottom: 0.5rem; color: var(--text-primary);">404</h1>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Page not found</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+pip-log.txt
+
+# Database and local runtime data
+instance/*.db
+instance/*.db-journal
+instance/*.sqlite
+instance/*.sqlite3
+
+# Uploads and generated files (keep folder placeholders)
+static/uploads/*
+!static/uploads/.gitkeep
+static/qrcodes/*
+!static/qrcodes/.gitkeep
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Logs
+*.log
+logs/

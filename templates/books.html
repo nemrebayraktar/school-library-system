@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}All Books - Library{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">All Books</h2>
+    <form action="{{ url_for('books') }}" method="get" class="search-box">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search books or authors...">
+        <button type="submit">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </button>
+    </form>
+</header>
+
+<div class="page-content">
+    <div class="filter-bar">
+        <span class="filter-label">Filter by Category:</span>
+        <a href="{{ url_for('books', search=search) }}" class="filter-chip {% if not selected_category %}active{% endif %}">All</a>
+        {% for cat in categories %}
+        <a href="{{ url_for('books', category=cat.id, search=search) }}" class="filter-chip {% if selected_category == cat.id %}active{% endif %}">{{ cat.name }}</a>
+        {% endfor %}
+    </div>
+    
+    <div class="books-grid">
+        {% for book in books.items %}
+        <a href="{{ url_for('book_detail', id=book.id) }}" class="book-card">
+            <div class="book-cover">
+                {% if book.image_path %}
+                <img src="{{ url_for('static', filename='uploads/' + book.image_path) }}" alt="{{ book.title }}">
+                {% else %}
+                <div class="no-image">
+                    <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    No Cover
+                </div>
+                {% endif %}
+                {% if book.category %}
+                <span class="book-category-badge">{{ book.category.name }}</span>
+                {% endif %}
+                <span class="book-location-badge">Floor {{ book.floor }} / {{ book.shelf }}</span>
+            </div>
+            <div class="book-info">
+                <h3 class="book-title">{{ book.title }}</h3>
+                <p class="book-author">{{ book.author }}</p>
+                <div class="book-meta">
+                    <div class="book-availability">
+                        <span class="availability-dot {% if book.available > 0 %}available{% else %}unavailable{% endif %}"></span>
+                        <span>{% if book.available > 0 %}Available ({{ book.available }}){% else %}Not Available{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem;">No books found.</p>
+        {% endfor %}
+    </div>
+    
+    {% if books.pages > 1 %}
+    <div class="pagination">
+        {% if books.has_prev %}
+        <a href="{{ url_for('books', page=books.prev_num, search=search, category=selected_category) }}" class="page-link">&laquo; Previous</a>
+        {% endif %}
+        
+        {% for page_num in books.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+        <a href="{{ url_for('books', page=page_num, search=search, category=selected_category) }}" class="page-link {% if page_num == books.page %}active{% endif %}">{{ page_num }}</a>
+        {% else %}
+        <span class="page-link disabled">...</span>
+        {% endif %}
+        {% endfor %}
+        
+        {% if books.has_next %}
+        <a href="{{ url_for('books', page=books.next_num, search=search, category=selected_category) }}" class="page-link">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

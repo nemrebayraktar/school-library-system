@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ student.name }} - Borrow History{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">{{ student.name }} - Borrow History</h2>
+    <a href="{{ url_for('admin_students') }}" class="btn btn-outline btn-sm">&larr; Back</a>
+</header>
+
+<div class="page-content">
+    <div class="card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div><strong>Student No:</strong> {{ student.student_number }}</div>
+            <div><strong>Email:</strong> {{ student.email or '-' }}</div>
+            <div><strong>Phone:</strong> {{ student.phone or '-' }}</div>
+            <div><strong>Department:</strong> {{ student.department or '-' }}</div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <table class="table">
+            <thead><tr><th>Book</th><th>Borrow Date</th><th>Due Date</th><th>Return Date</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for borrow in borrows %}
+                <tr>
+                    <td>{{ borrow.book.title }}</td>
+                    <td>{{ borrow.borrow_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ borrow.due_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ borrow.return_date.strftime('%Y-%m-%d') if borrow.return_date else '-' }}</td>
+                    <td><span class="badge badge-{% if borrow.status == 'returned' %}success{% elif borrow.status == 'overdue' %}danger{% else %}warning{% endif %}">{{ borrow.status|title }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No borrow history.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}AI Book Assistant - Library{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">AI Book Assistant</h2>
+</header>
+
+<div class="page-content"> <!--görsel seçimlerini öneri üzerine aldım.-->
+    <div class="ai-chat-container">
+        <div class="ai-chat-header">
+            <div class="ai-avatar">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            </div>
+            <div>
+                <h3>AI Book Assistant</h3>
+                <p>Get personalized book recommendations</p>
+            </div>
+        </div>
+        
+        <div class="ai-chat-messages" id="aichatmessage">
+            <div class="ai-message">
+                <div class="message-content">
+                    Hello! I'm your library assistant. I can help you find the perfect book based on your interests and mood. What kind of book are you looking for?
+                </div>
+            </div>
+        </div>
+        
+        <div class="ai-chat-input"> <!--entera basılınca sendMessage çağırılacak-->
+            <input type="text" id="usermesaj" placeholder="Ask me for book recommendations..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()" id="sendBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+    
+    <div class="ai-suggestions">
+        <h4>Try asking:</h4>
+        <div class="suggestion-chips">
+            <button class="suggestion-chip" onclick="askSuggestion('I want to read an adventure book')">Adventure book</button>
+            <button class="suggestion-chip" onclick="askSuggestion('Can you recommend a science fiction book?')">Science fiction</button>
+            <button class="suggestion-chip" onclick="askSuggestion('I want something to learn from')">Educational book</button>
+            <button class="suggestion-chip" onclick="askSuggestion('Recommend me a classic novel')">Classic novel</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function sendMessage() {
+    const input = document.getElementById('usermesaj');
+    const message = input.value.trim(); //trim ile boşlukları silecek !message ile de boş mesaj atamayacak
+    if (!message) return;
+    
+    const aichatmessage = document.getElementById('aichatmessage');
+    
+    //XSS koruması için özellikle seçtim.kullanıcı xss saldırısı yapmak isterse zararsız bir input gibi görünecek.
+    aichatmessage.innerHTML += `
+        <div class="user-message">
+            <div class="message-content">${escapeHtml(message)}</div>
+        </div>
+    `;
+    
+    input.value = '';
+    aichatmessage.scrollTop = aichatmessage.scrollHeight;
+    
+    // Token'dan düşene kadar düşünüyor animasyonu görünecek.Boş ekran dönmeyecek.
+    const loadingId = 'loading-' + Date.now();
+    aichatmessage.innerHTML += `
+        <div class="ai-message" id="${loadingId}">
+            <div class="message-content">
+                <span class="loading-dots">Thinking<span>.</span><span>.</span><span>.</span></span>
+            </div>
+        </div>
+    `;
+    aichatmessage.scrollTop = aichatmessage.scrollHeight;
+    
+    //JS in http requesti için bu kullanılması gerekiyormuş referanstan aldım.recommend fonksiyonu ile beraber çalışacak eklediğimde
+    fetch('/api/ai-recommend', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: message})
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(loadingId).remove();//cevap gelince loading silinecek.
+        //mesajı alır yoksa hata mesajı döner.
+        const responseText = data.response || data.error || 'Sorry, I can not generate a response.';
+        aichatmessage.innerHTML += `
+            <div class="ai-message">
+                <div class="message-content">${escapeHtml(responseText).replace(/\n/g, '<br>')}</div>
+            </div>
+        `;
+        aichatmessage.scrollTop = aichatmessage.scrollHeight;
+    })
+    .catch(error => {//Ağ hatası için eklemem gerekiyor.Referans dolayısıyla öğrendim ve entegre ettim.
+        document.getElementById(loadingId).remove();
+        aichatmessage.innerHTML += `
+            <div class="ai-message error">
+                <div class="message-content">Sorry, an error occurred. Please check your connection.</div>
+            </div>
+        `;
+        aichatmessage.scrollTop = aichatmessage.scrollHeight;
+    });
+}
+
+function askSuggestion(text) {//öneri butonunu mesaja yazar ve gönderir
+    document.getElementById('usermesaj').value = text;
+    sendMessage();
+}
+
+function escapeHtml(text) {//scriptleri geçiçi olarak bozar ve xss saldırısı için koruma sağlar
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}

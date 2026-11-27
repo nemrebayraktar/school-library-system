@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} - Library{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">{{ category.name }}</h2>
+    <a href="{{ url_for('books') }}" class="btn btn-outline btn-sm">&larr; All Books</a>
+</header>
+
+<div class="page-content">
+    <div class="books-grid">
+        {% for book in books.items %}
+        <a href="{{ url_for('book_detail', id=book.id) }}" class="book-card">
+            <div class="book-cover">
+                {% if book.image_path %}
+                <img src="{{ url_for('static', filename='uploads/' + book.image_path) }}" alt="{{ book.title }}">
+                {% else %}
+                <div class="no-image">
+                    <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    No Cover
+                </div>
+                {% endif %}
+                <span class="book-location-badge">Floor {{ book.floor }} / {{ book.shelf }}</span>
+            </div>
+            <div class="book-info">
+                <h3 class="book-title">{{ book.title }}</h3>
+                <p class="book-author">{{ book.author }}</p>
+                <div class="book-meta">
+                    <div class="book-availability">
+                        <span class="availability-dot {% if book.available > 0 %}available{% else %}unavailable{% endif %}"></span>
+                        <span>{% if book.available > 0 %}Available ({{ book.available }}){% else %}Not Available{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem;">No books in this category yet.</p>
+        {% endfor %}
+    </div>
+    
+    {% if books.pages > 1 %}
+    <div class="pagination">
+        {% if books.has_prev %}
+        <a href="{{ url_for('category_books', id=category.id, page=books.prev_num) }}" class="page-link">&laquo; Previous</a>
+        {% endif %}
+        
+        {% for page_num in books.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+        <a href="{{ url_for('category_books', id=category.id, page=page_num) }}" class="page-link {% if page_num == books.page %}active{% endif %}">{{ page_num }}</a>
+        {% else %}
+        <span class="page-link disabled">...</span>
+        {% endif %}
+        {% endfor %}
+        
+        {% if books.has_next %}
+        <a href="{{ url_for('category_books', id=category.id, page=books.next_num) }}" class="page-link">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}About Us - Library{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">About Us</h2>
+</header>
+
+<div class="page-content">
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="about-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.64 12 4.18zM4 8.82l7 3.5v7.09l-7-3.5V8.82zm9 10.59v-7.09l7-3.5v7.09l-7 3.5z"/></svg>
+            </div>
+            <h3>Our Library</h3>
+            <p>Our digital library system provides easy access to thousands of books. Find what you're looking for with our advanced search and filtering capabilities.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            </div>
+            <h3>AI Assistant</h3>
+            <p>Can't decide what to read? Our AI-powered assistant analyzes your preferences and provides personalized book recommendations.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <h3>Easy Location</h3>
+            <p>Each book comes with floor and shelf information, making it easy for you to find exactly where your desired book is located.</p>
+        </div>
+    </div>
+    
+    <div class="about-features">
+        <h3>Features</h3>
+        <ul>
+            <li>Advanced book search and filtering</li>
+            <li>Detailed book information with location</li>
+            <li>AI-powered book recommendations</li>
+            <li>User-friendly modern interface</li>
+            <li>Mobile-responsive design</li>
+            <li>Real-time availability tracking</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

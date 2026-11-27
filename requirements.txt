@@ -1,0 +1,6 @@
+flask
+flask-sqlalchemy
+werkzeug
+anthropic
+qrcode[pil]
+python-dotenv

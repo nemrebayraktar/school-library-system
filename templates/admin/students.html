@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}Students - Admin{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">Students</h2>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+        <form action="{{ url_for('admin_students') }}" method="get" class="search-box">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search students...">
+            <button type="submit"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+        </form>
+        <a href="{{ url_for('admin_student_add') }}" class="btn btn-primary">+ Add Student</a>
+    </div>
+</header>
+
+<div class="page-content">
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr><th>Student No</th><th>Name</th><th>Email</th><th>Department</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for student in students.items %}
+                <tr>
+                    <td><strong>{{ student.student_number }}</strong></td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.email or '-' }}</td>
+                    <td>{{ student.department or '-' }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{{ url_for('admin_student_history', id=student.id) }}" class="btn btn-sm btn-outline">History</a>
+                            <a href="{{ url_for('admin_student_edit', id=student.id) }}" class="btn btn-sm btn-outline">Edit</a>
+                            <form action="{{ url_for('admin_student_delete', id=student.id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No students found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if students.pages > 1 %}
+    <div class="pagination">
+        {% if students.has_prev %}<a href="{{ url_for('admin_students', page=students.prev_num, search=search) }}" class="page-link">&laquo;</a>{% endif %}
+        {% for page_num in students.iter_pages() %}{% if page_num %}<a href="{{ url_for('admin_students', page=page_num, search=search) }}" class="page-link {% if page_num == students.page %}active{% endif %}">{{ page_num }}</a>{% endif %}{% endfor %}
+        {% if students.has_next %}<a href="{{ url_for('admin_students', page=students.next_num, search=search) }}" class="page-link">&raquo;</a>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

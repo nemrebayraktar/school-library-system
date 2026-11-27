@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Library{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('index') }}" class="sidebar-logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.64 12 4.18zM4 8.82l7 3.5v7.09l-7-3.5V8.82zm9 10.59v-7.09l7-3.5v7.09l-7 3.5z"/></svg>
+                    </div>
+                    <h1>Library<span>Digital Library System</span></h1>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main Menu</div>
+                    <a class="nav-item {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
+                        <span>Home</span>
+                    </a>
+                    <a class="nav-item {% if request.endpoint == 'books' %}active{% endif %}" href="{{ url_for('books') }}">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></span>
+                        <span>All Books</span>
+                    </a>
+                    <a class="nav-item {% if request.endpoint == 'ai_assistant' %}active{% endif %}" href="{{ url_for('ai_assistant') }}">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></span>
+                        <span>AI Book Assistant</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Categories</div>
+                    {% set categories = [] %}
+                    {% for cat in get_categories() if get_categories is defined %}
+                    <a class="nav-item" href="{{ url_for('category_books', id=cat.id) }}">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></span>
+                        <span>{{ cat.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Other</div>
+                    <a class="nav-item {% if request.endpoint == 'about' %}active{% endif %}" href="{{ url_for('about') }}">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></span>
+                        <span>About Us</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('admin_login') }}" class="admin-btn">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    <span>Admin Login</span>
+                </a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div style="padding: 1rem 2rem 0;">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

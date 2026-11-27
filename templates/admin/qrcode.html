@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% block title %}QR Code - Admin{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h2 class="page-title">QR Code Access</h2>
+</header>
+
+<div class="page-content">
+    <div class="card" style="max-width: 500px; text-align: center; padding: 2rem;">
+        <h3 style="margin-bottom: 1rem;">Scan to Access Library</h3>
+        <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Code" style="max-width: 250px; margin: 1rem auto;">
+        <p style="margin-top: 1rem; color: var(--text-muted);">
+            <strong>URL:</strong> {{ url }}<br>
+            <strong>IP:</strong> {{ ip }}<br>
+            <strong>Port:</strong> {{ port }}
+        </p>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">
+            Users on the same network can scan this QR code to access the library.
+        </p>
+    </div>
+</div>
+{% endblock %}
